@@ -1,6 +1,6 @@
 # Memo – PWA per memo vocali (ipovedenti)
 
-**Versione:** 1.0.1 · **Repository previsto:** forrom58/memo · **URL:** https://forrom58.github.io/memo/
+**Versione:** 1.0.2 · **Repository previsto:** forrom58/memo · **URL:** https://forrom58.github.io/memo/
 
 ## Scopo
 Registrare brevi memo audio fuori casa **senza guardare lo schermo** e riascoltarli a casa.
@@ -26,7 +26,7 @@ Registrare brevi memo audio fuori casa **senza guardare lo schermo** e riascolta
 ## Dati tecnici
 - Audio: MediaRecorder, formato webm/opus.
 - Archivio: IndexedDB `memo-db`, tabella `memo` (id, data, secondi, audio). I memo restano **solo sul telefono**: disinstallando l'app o cancellando i dati del sito si perdono.
-- Colori interfaccia: sfondo #121619, pannelli #1c2328, testo #a9b4bb, registrazione in rosso scuro #7a2e2e. Niente giallo, niente superfici chiare.
+- Colori interfaccia: sfondo #121619, pannelli #1c2328, testo #a9b4bb, registrazione in rosso scuro #7a2e2e. Elenco memo (dalla v1.0.2, più contrasto): sfondo #08090a, riquadri #27323a con bordo #4a5a66 da 2 px. Niente giallo, niente superfici chiare.
 
 ## Aggiornare l'app
 1. Cambiare `VERSIONE` in index.html e il testo `v…` in alto a destra.
