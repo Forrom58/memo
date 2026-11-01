@@ -1,6 +1,6 @@
 # Memo – PWA per memo vocali (ipovedenti)
 
-**Versione:** 1.2.0 · **Repository previsto:** forrom58/memo · **URL:** https://forrom58.github.io/memo/
+**Versione:** 1.2.1 · **Repository previsto:** forrom58/memo · **URL:** https://forrom58.github.io/memo/
 
 ## Scopo
 Registrare brevi memo audio fuori casa **senza guardare lo schermo** e riascoltarli a casa.
@@ -15,6 +15,7 @@ Registrare brevi memo audio fuori casa **senza guardare lo schermo** e riascolta
   - Si ferma e salva da sola dopo 5 minuti.
   - Dopo il salvataggio prova a chiudersi da sola (`window.close()`, dalla v1.0.1): Android può ignorarlo.
   - Durante la registrazione lo schermo resta acceso (Wake Lock).
+  - La scritta di stato ha altezza fissa di due righe (dalla v1.2.1): prima "Registro… tocca per fermare" andava a capo e il cerchio saliva di circa 15 px.
 - **Ascoltare:** pulsante "Ascolta i memo" in basso → elenco (più recenti in alto) con data, ora, durata, Ascolta/Ferma, Elimina (con conferma).
 - **Rinominare (dalla v1.1.0):** tocco lungo (0,6 s) su un riquadro → vibrazione → finestra scura "Nome del memo" (Salva / Annulla). Il nome compare al posto della data; data e durata vanno nella riga piccola sotto. Nome vuoto = torna a mostrare la data. Campo `nome` nel record IndexedDB.
 - **Calendario (dalla v1.1.0):** scritta "Calendario" (#9fb39a) tra Ascolta ed Elimina. Crea un evento già compilato (titolo = nome del memo, oppure "Memo del …"; nota = data del memo). v1.1.0: intent `android.intent.action.INSERT` → non funziona da Chrome (apriva Google Calendar nel browser). v1.1.1: intent verso il pacchetto `com.google.android.calendar` con l'indirizzo `calendar.google.com/calendar/render?action=TEMPLATE…`; se l'app non lo accetta apre la versione web. Esito sul Realme: **funziona**, si apre l'app con l'evento compilato. Data e ora dell'evento si scelgono nel calendario.

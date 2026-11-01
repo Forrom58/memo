@@ -41,7 +41,9 @@
   body.reg #cerchio { background: var(--rosso); border-color: var(--rosso-chiaro); animation: pulsa 1.4s infinite; }
   body.reg #cerchio svg { fill: #d9c4c4; }
   @keyframes pulsa { 50% { transform: scale(1.06); } }
-  #stato { font-size: 26px; font-weight: 600; color: #9fbdb9; }
+  /* Altezza fissa per due righe: il cerchio non si sposta quando cambia la scritta */
+  #stato { font-size: 26px; font-weight: 600; color: #9fbdb9; line-height: 1.2; min-height: 2.4em;
+    display: flex; align-items: center; justify-content: center; }
   #tempo { font-size: 22px; color: var(--tenue); min-height: 28px; font-variant-numeric: tabular-nums; }
 
   #barra { padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); border-top: 1px solid #1F4A4A; }
@@ -88,7 +90,7 @@
 </style>
 </head>
 <body>
-<div id="titolo"><h1><svg viewBox="5 2 14 19" aria-hidden="true"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11h-2z"/></svg>Memo</h1><span id="versione">v1.2.0</span></div>
+<div id="titolo"><h1><svg viewBox="5 2 14 19" aria-hidden="true"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11h-2z"/></svg>Memo</h1><span id="versione">v1.2.1</span></div>
 
 <div id="area" role="button" aria-label="Tocca per registrare o fermare">
   <div id="cerchio">
@@ -116,7 +118,7 @@
 </div>
 
 <script>
-const VERSIONE = '1.2.0';
+const VERSIONE = '1.2.1';
 const DURATA_MAX = 5 * 60; // secondi: oltre questo tempo si ferma e salva da sola
 
 /* ---------- Archivio (IndexedDB) ---------- */
