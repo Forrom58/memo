@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="it" style="background:#121619">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#121619">
+<meta name="color-scheme" content="dark">
+<title>Memo</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+  :root {
+    --sfondo: #121619;
+    --pannello: #1c2328;
+    --bordo: #2c363d;
+    --testo: #a9b4bb;
+    --tenue: #6f7c85;
+    --accento: #3f6f86;
+    --rosso: #7a2e2e;
+    --rosso-chiaro: #b05454;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; height: 100%; background: var(--sfondo); color: var(--testo);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  body { display: flex; flex-direction: column; user-select: none; -webkit-user-select: none; }
+  #versione { position: fixed; top: 6px; right: 10px; font-size: 12px; color: var(--tenue); z-index: 10; }
+
+  /* Schermata registrazione: tutto lo schermo è il pulsante */
+  #area { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 18px; text-align: center; padding: 24px; touch-action: manipulation; }
+  #cerchio { width: 140px; height: 140px; border-radius: 50%; background: var(--pannello);
+    border: 3px solid var(--bordo); display: flex; align-items: center; justify-content: center; }
+  #cerchio svg { width: 64px; height: 64px; fill: var(--tenue); }
+  body.reg #cerchio { background: var(--rosso); border-color: var(--rosso-chiaro); animation: pulsa 1.4s infinite; }
+  body.reg #cerchio svg { fill: #d9c4c4; }
+  @keyframes pulsa { 50% { transform: scale(1.06); } }
+  #stato { font-size: 26px; font-weight: 600; }
+  #tempo { font-size: 22px; color: var(--tenue); min-height: 28px; font-variant-numeric: tabular-nums; }
+
+  #barra { padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); border-top: 1px solid var(--bordo); }
+  button { font: inherit; color: var(--testo); background: var(--pannello); border: 1px solid var(--bordo);
+    border-radius: 10px; padding: 12px 16px; font-size: 18px; }
+  button:active { background: var(--bordo); }
+  #btnElenco { width: 100%; }
+
+  /* Schermata elenco */
+  #elenco { display: none; flex: 1; flex-direction: column; overflow: hidden; }
+  body.vista-elenco #area, body.vista-elenco #barra { display: none; }
+  body.vista-elenco #elenco { display: flex; }
+  #testaElenco { display: flex; align-items: center; gap: 12px; padding: 30px 16px 12px; border-bottom: 1px solid var(--bordo); }
+  #testaElenco h1 { font-size: 22px; margin: 0; flex: 1; }
+  #lista { flex: 1; overflow-y: auto; padding: 12px 16px calc(16px + env(safe-area-inset-bottom)); }
+  .memo { background: var(--pannello); border: 1px solid var(--bordo); border-radius: 12px; padding: 14px;
+    margin-bottom: 12px; }
+  .memo .data { font-size: 20px; font-weight: 600; }
+  .memo .durata { font-size: 16px; color: var(--tenue); margin-top: 4px; }
+  .memo .comandi { display: flex; gap: 10px; margin-top: 12px; }
+  .memo .comandi button { flex: 1; }
+  .memo.suona { border-color: var(--accento); }
+  .memo button.elimina { flex: 0 0 auto; color: var(--rosso-chiaro); }
+  #vuoto { text-align: center; color: var(--tenue); font-size: 20px; margin-top: 40px; }
+</style>
+</head>
+<body>
+<div id="versione">v1.0.0</div>
+
+<div id="area" role="button" aria-label="Tocca per registrare o fermare">
+  <div id="cerchio">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11h-2z"/></svg>
+  </div>
+  <div id="stato">Tocca per registrare</div>
+  <div id="tempo"></div>
+</div>
+<div id="barra"><button id="btnElenco">Ascolta i memo</button></div>
+
+<div id="elenco">
+  <div id="testaElenco">
+    <button id="btnIndietro">Indietro</button>
+    <h1>Memo salvati</h1>
+  </div>
+  <div id="lista"></div>
+</div>
+
+<script>
+const VERSIONE = '1.0.0';
+const DURATA_MAX = 5 * 60; // secondi: oltre questo tempo si ferma e salva da sola
+
+/* ---------- Archivio (IndexedDB) ---------- */
+let db;
+function apriDB() {
+  return new Promise((ok, ko) => {
+    const r = indexedDB.open('memo-db', 1);
+    r.onupgradeneeded = () => r.result.createObjectStore('memo', { keyPath: 'id', autoIncrement: true });
+    r.onsuccess = () => { db = r.result; ok(); };
+    r.onerror = () => ko(r.error);
+  });
+}
+function salvaMemo(m) {
+  return new Promise((ok, ko) => {
+    const t = db.transaction('memo', 'readwrite');
+    t.objectStore('memo').add(m);
+    t.oncomplete = ok; t.onerror = () => ko(t.error);
+  });
+}
+function leggiMemo() {
+  return new Promise((ok, ko) => {
+    const r = db.transaction('memo').objectStore('memo').getAll();
+    r.onsuccess = () => ok(r.result.reverse()); r.onerror = () => ko(r.error);
+  });
+}
+function eliminaMemo(id) {
+  return new Promise((ok, ko) => {
+    const t = db.transaction('memo', 'readwrite');
+    t.objectStore('memo').delete(id);
+    t.oncomplete = ok; t.onerror = () => ko(t.error);
+  });
+}
+
+/* ---------- Voce e vibrazione ---------- */
+function vibra(schema) { try { navigator.vibrate && navigator.vibrate(schema); } catch (e) {} }
+function parla(testo) {
+  return new Promise(ok => {
+    try {
+      speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(testo);
+      u.lang = 'it-IT'; u.rate = 1.05;
+      let fatto = false;
+      const fine = () => { if (!fatto) { fatto = true; ok(); } };
+      u.onend = fine; u.onerror = fine;
+      setTimeout(fine, 2500); // sicurezza se la voce non risponde
+      speechSynthesis.speak(u);
+    } catch (e) { ok(); }
+  });
+}
+function durataParlata(s) {
+  s = Math.round(s);
+  if (s < 60) return s + (s === 1 ? ' secondo' : ' secondi');
+  const m = Math.floor(s / 60), r = s % 60;
+  return m + (m === 1 ? ' minuto' : ' minuti') + (r ? ' e ' + r + ' secondi' : '');
+}
+function durataScritta(s) {
+  s = Math.round(s);
+  return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+}
+
+/* ---------- Registrazione ---------- */
+const $ = id => document.getElementById(id);
+let rec = null, pezzi = [], inizio = 0, timer = null, wakeLock = null, occupato = false;
+
+async function avvia() {
+  occupato = true;
+  vibra(150);
+  await parla('Registro');
+  let stream;
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  } catch (e) {
+    vibra([100, 80, 100, 80, 100]);
+    $('stato').textContent = 'Microfono non disponibile';
+    await parla('Microfono non disponibile. Controlla il permesso.');
+    occupato = false; return;
+  }
+  const tipo = MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? 'audio/webm;codecs=opus' : '';
+  rec = new MediaRecorder(stream, tipo ? { mimeType: tipo } : undefined);
+  pezzi = [];
+  rec.ondataavailable = e => { if (e.data.size) pezzi.push(e.data); };
+  rec.onstop = salvaFine;
+  rec.start(1000);
+  inizio = Date.now();
+  document.body.classList.add('reg');
+  $('stato').textContent = 'Registro… tocca per fermare';
+  $('tempo').textContent = '0:00';
+  timer = setInterval(() => {
+    const s = (Date.now() - inizio) / 1000;
+    $('tempo').textContent = durataScritta(s);
+    if (s >= DURATA_MAX) ferma();
+  }, 500);
+  try { wakeLock = await navigator.wakeLock.request('screen'); } catch (e) {}
+  occupato = false;
+}
+
+function ferma() {
+  if (!rec || rec.state === 'inactive') return;
+  occupato = true;
+  clearInterval(timer);
+  rec.stop();
+  rec.stream.getTracks().forEach(t => t.stop());
+}
+
+async function salvaFine() {
+  const secondi = (Date.now() - inizio) / 1000;
+  const blob = new Blob(pezzi, { type: rec.mimeType || 'audio/webm' });
+  rec = null;
+  document.body.classList.remove('reg');
+  try { wakeLock && wakeLock.release(); } catch (e) {} wakeLock = null;
+  try {
+    await salvaMemo({ data: Date.now(), secondi, audio: blob });
+    vibra([200, 100, 200]);
+    $('stato').textContent = 'Salvato';
+    $('tempo').textContent = durataScritta(secondi);
+    await parla('Salvato. ' + durataParlata(secondi));
+  } catch (e) {
+    vibra([100, 80, 100, 80, 100]);
+    $('stato').textContent = 'Errore nel salvataggio';
+    await parla('Errore nel salvataggio');
+  }
+  $('stato').textContent = 'Tocca per registrare';
+  occupato = false;
+}
+
+$('area').addEventListener('click', () => {
+  if (occupato) return;
+  if (rec && rec.state === 'recording') ferma(); else avvia();
+});
+
+/* ---------- Elenco e ascolto ---------- */
+let player = null, urlCorrente = null, cardCorrente = null;
+
+function fermaAscolto() {
+  if (player) { player.pause(); player = null; }
+  if (urlCorrente) { URL.revokeObjectURL(urlCorrente); urlCorrente = null; }
+  if (cardCorrente) {
+    cardCorrente.classList.remove('suona');
+    cardCorrente.querySelector('.ascolta').textContent = 'Ascolta';
+    cardCorrente = null;
+  }
+}
+
+function formatoData(ms) {
+  const d = new Date(ms);
+  return d.toLocaleDateString('it-IT', { weekday: 'short', day: 'numeric', month: 'short' }) +
+    ', ore ' + d.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
+}
+
+async function mostraElenco() {
+  fermaAscolto();
+  document.body.classList.add('vista-elenco');
+  const lista = $('lista');
+  lista.innerHTML = '';
+  const memo = await leggiMemo();
+  if (!memo.length) { lista.innerHTML = '<div id="vuoto">Nessun memo salvato</div>'; return; }
+  memo.forEach(m => {
+    const card = document.createElement('div');
+    card.className = 'memo';
+    card.innerHTML = '<div class="data"></div><div class="durata"></div>' +
+      '<div class="comandi"><button class="ascolta">Ascolta</button><button class="elimina">Elimina</button></div>';
+    card.querySelector('.data').textContent = formatoData(m.data);
+    card.querySelector('.durata').textContent = 'Durata ' + durataScritta(m.secondi);
+    card.querySelector('.ascolta').onclick = () => {
+      if (cardCorrente === card) { fermaAscolto(); return; }
+      fermaAscolto();
+      urlCorrente = URL.createObjectURL(m.audio);
+      player = new Audio(urlCorrente);
+      player.onended = fermaAscolto;
+      player.play();
+      cardCorrente = card;
+      card.classList.add('suona');
+      card.querySelector('.ascolta').textContent = 'Ferma';
+    };
+    card.querySelector('.elimina').onclick = async () => {
+      if (!confirm('Eliminare questo memo?')) return;
+      if (cardCorrente === card) fermaAscolto();
+      await eliminaMemo(m.id);
+      mostraElenco();
+    };
+    lista.appendChild(card);
+  });
+}
+
+$('btnElenco').onclick = mostraElenco;
+$('btnIndietro').onclick = () => { fermaAscolto(); document.body.classList.remove('vista-elenco'); };
+
+/* ---------- Avvio ---------- */
+$('versione').textContent = 'v' + VERSIONE;
+apriDB();
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
+// Chiede all'archivio di non cancellare i memo per mancanza di spazio
+if (navigator.storage && navigator.storage.persist) navigator.storage.persist();
+</script>
+</body>
+</html>
