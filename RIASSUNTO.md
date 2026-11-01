@@ -1,6 +1,6 @@
 # Memo – PWA per memo vocali (ipovedenti)
 
-**Versione:** 1.0.3 · **Repository previsto:** forrom58/memo · **URL:** https://forrom58.github.io/memo/
+**Versione:** 1.1.0 · **Repository previsto:** forrom58/memo · **URL:** https://forrom58.github.io/memo/
 
 ## Scopo
 Registrare brevi memo audio fuori casa **senza guardare lo schermo** e riascoltarli a casa.
@@ -16,6 +16,8 @@ Registrare brevi memo audio fuori casa **senza guardare lo schermo** e riascolta
   - Dopo il salvataggio prova a chiudersi da sola (`window.close()`, dalla v1.0.1): Android può ignorarlo.
   - Durante la registrazione lo schermo resta acceso (Wake Lock).
 - **Ascoltare:** pulsante "Ascolta i memo" in basso → elenco (più recenti in alto) con data, ora, durata, Ascolta/Ferma, Elimina (con conferma).
+- **Rinominare (dalla v1.1.0):** tocco lungo (0,6 s) su un riquadro → vibrazione → finestra scura "Nome del memo" (Salva / Annulla). Il nome compare al posto della data; data e durata vanno nella riga piccola sotto. Nome vuoto = torna a mostrare la data. Campo `nome` nel record IndexedDB.
+- **Calendario (dalla v1.1.0):** scritta "Calendario" (#9fb39a) tra Ascolta ed Elimina. Su Android apre l'app calendario con un nuovo evento già compilato (titolo = nome del memo, oppure "Memo del …"; nota = data del memo) tramite intent `android.intent.action.INSERT`; se nessuna app risponde apre Google Calendar nel browser. Data e ora dell'evento si scelgono nel calendario.
 
 ## File (ordine alfabetico)
 - icon-192.png, icon-512.png – icona secondo lo standard di ICONE-DELLE-MIE-APP.md: fascia da y=369, "MEMO" in Barlow Black 132 px (base y=491); sfondo #1F4A4A, fascia #9FC7C2, scritta #143434, microfono #D2E6E3 (linee 18 px, appoggiato sulla fascia)

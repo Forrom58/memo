@@ -1,5 +1,5 @@
 // Cambiare il numero a ogni aggiornamento dell'app
-const CACHE = 'memo-v1.0.3';
+const CACHE = 'memo-v1.1.0';
 const FILE = ['./', 'index.html', 'manifest.json', 'icon-192.png', 'icon-512.png'];
 
 self.addEventListener('install', e => {

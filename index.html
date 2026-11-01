@@ -70,11 +70,25 @@
   .memo button.ascolta { color: #8fb3c2; }
   .memo button.elimina { color: #c27a7a; }
   .memo.suona { background: #31424d; }
+  .memo button.calendario { color: #9fb39a; }
+  .memo .suggerimento { font-size: 12px; color: var(--tenue); }
+  /* Finestra scura per rinominare */
+  #finestra { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.75); z-index: 20;
+    align-items: flex-start; justify-content: center; padding: 80px 16px 0; }
+  #finestra.aperta { display: flex; }
+  #finestra .box { background: #1c2328; border-radius: 10px; padding: 14px; width: 100%; max-width: 420px; }
+  #finestra .box > div:first-child { font-size: 16px; font-weight: 600; margin-bottom: 10px; }
+  #nomeInput { width: 100%; font: inherit; font-size: 17px; color: var(--testo); background: #0e1113;
+    border: 1px solid #3a4650; border-radius: 8px; padding: 9px 10px; outline: none; user-select: text; -webkit-user-select: text; }
+  #finestra .azioni { display: flex; justify-content: space-between; margin-top: 10px; }
+  #finestra .azioni button { background: none; border: none; padding: 6px 0; font-size: 16px; font-weight: 700; }
+  #btnSalvaNome { color: #8fb3c2; }
+  #btnAnnullaNome { color: var(--tenue); }
   #vuoto { text-align: center; color: var(--tenue); font-size: 17px; margin-top: 40px; }
 </style>
 </head>
 <body>
-<div id="titolo"><h1><svg viewBox="5 2 14 19" aria-hidden="true"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11h-2z"/></svg>Memo</h1><span id="versione">v1.0.3</span></div>
+<div id="titolo"><h1><svg viewBox="5 2 14 19" aria-hidden="true"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11h-2z"/></svg>Memo</h1><span id="versione">v1.1.0</span></div>
 
 <div id="area" role="button" aria-label="Tocca per registrare o fermare">
   <div id="cerchio">
@@ -93,8 +107,16 @@
   <div id="lista"></div>
 </div>
 
+<div id="finestra">
+  <div class="box">
+    <div>Nome del memo</div>
+    <input id="nomeInput" type="text" maxlength="60" autocomplete="off" enterkeyhint="done">
+    <div class="azioni"><button id="btnAnnullaNome">Annulla</button><button id="btnSalvaNome">Salva</button></div>
+  </div>
+</div>
+
 <script>
-const VERSIONE = '1.0.3';
+const VERSIONE = '1.1.0';
 const DURATA_MAX = 5 * 60; // secondi: oltre questo tempo si ferma e salva da sola
 
 /* ---------- Archivio (IndexedDB) ---------- */
@@ -118,6 +140,13 @@ function leggiMemo() {
   return new Promise((ok, ko) => {
     const r = db.transaction('memo').objectStore('memo').getAll();
     r.onsuccess = () => ok(r.result.reverse()); r.onerror = () => ko(r.error);
+  });
+}
+function aggiornaMemo(m) {
+  return new Promise((ok, ko) => {
+    const t = db.transaction('memo', 'readwrite');
+    t.objectStore('memo').put(m);
+    t.oncomplete = ok; t.onerror = () => ko(t.error);
   });
 }
 function eliminaMemo(id) {
@@ -257,9 +286,29 @@ async function mostraElenco() {
     const card = document.createElement('div');
     card.className = 'memo';
     card.innerHTML = '<div class="data"></div><div class="durata"></div>' +
-      '<div class="comandi"><button class="ascolta">Ascolta</button><button class="elimina">Elimina</button></div>';
-    card.querySelector('.data').textContent = formatoData(m.data);
-    card.querySelector('.durata').textContent = 'Durata ' + durataScritta(m.secondi);
+      '<div class="comandi"><button class="ascolta">Ascolta</button><button class="calendario">Calendario</button>' +
+      '<button class="elimina">Elimina</button></div>';
+    if (m.nome) {
+      card.querySelector('.data').textContent = m.nome;
+      card.querySelector('.durata').textContent = formatoData(m.data) + ' · ' + durataScritta(m.secondi);
+    } else {
+      card.querySelector('.data').textContent = formatoData(m.data);
+      card.querySelector('.durata').textContent = 'Durata ' + durataScritta(m.secondi);
+    }
+    // Tocco lungo sul riquadro: rinomina
+    let tLungo = null, x0 = 0, y0 = 0;
+    card.addEventListener('pointerdown', e => {
+      x0 = e.clientX; y0 = e.clientY;
+      tLungo = setTimeout(() => { tLungo = null; card.dataset.lungo = '1'; setTimeout(() => delete card.dataset.lungo, 1000); vibra(60); apriRinomina(m); }, 600);
+    });
+    const annullaLungo = () => { if (tLungo) { clearTimeout(tLungo); tLungo = null; } };
+    card.addEventListener('pointerup', annullaLungo);
+    card.addEventListener('pointercancel', annullaLungo);
+    card.addEventListener('pointermove', e => { if (Math.abs(e.clientX - x0) > 10 || Math.abs(e.clientY - y0) > 10) annullaLungo(); });
+    card.addEventListener('contextmenu', e => e.preventDefault());
+    // Dopo un tocco lungo non far scattare Ascolta/Calendario/Elimina
+    card.addEventListener('click', e => { if (card.dataset.lungo) { e.stopPropagation(); e.preventDefault(); delete card.dataset.lungo; } }, true);
+    card.querySelector('.calendario').onclick = () => apriCalendario(m);
     card.querySelector('.ascolta').onclick = () => {
       if (cardCorrente === card) { fermaAscolto(); return; }
       fermaAscolto();
@@ -279,6 +328,41 @@ async function mostraElenco() {
     };
     lista.appendChild(card);
   });
+}
+
+/* ---------- Rinomina ---------- */
+let memoDaRinominare = null;
+function apriRinomina(m) {
+  memoDaRinominare = m;
+  $('nomeInput').value = m.nome || '';
+  $('finestra').classList.add('aperta');
+  setTimeout(() => $('nomeInput').focus(), 50);
+}
+function chiudiRinomina() { $('finestra').classList.remove('aperta'); $('nomeInput').blur(); memoDaRinominare = null; }
+async function salvaNome() {
+  if (!memoDaRinominare) return;
+  const nome = $('nomeInput').value.trim();
+  if (nome) memoDaRinominare.nome = nome; else delete memoDaRinominare.nome; // vuoto = torna alla data
+  await aggiornaMemo(memoDaRinominare);
+  chiudiRinomina();
+  mostraElenco();
+}
+$('btnSalvaNome').onclick = salvaNome;
+$('btnAnnullaNome').onclick = chiudiRinomina;
+$('nomeInput').addEventListener('keydown', e => { if (e.key === 'Enter') salvaNome(); });
+
+/* ---------- Calendario ---------- */
+// Apre l'app calendario con un nuovo evento già compilato (titolo = nome del memo).
+// Se nessuna app risponde, apre Google Calendar nel browser.
+function apriCalendario(m) {
+  const titolo = m.nome || ('Memo del ' + formatoData(m.data));
+  const nota = 'Dal memo vocale del ' + formatoData(m.data);
+  const web = 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=' +
+    encodeURIComponent(titolo) + '&details=' + encodeURIComponent(nota);
+  const intent = 'intent:#Intent;action=android.intent.action.INSERT;type=vnd.android.cursor.item/event;' +
+    'S.title=' + encodeURIComponent(titolo) + ';S.description=' + encodeURIComponent(nota) +
+    ';S.browser_fallback_url=' + encodeURIComponent(web) + ';end';
+  location.href = /Android/i.test(navigator.userAgent) ? intent : web;
 }
 
 $('btnElenco').onclick = mostraElenco;
