@@ -88,7 +88,7 @@
 </style>
 </head>
 <body>
-<div id="titolo"><h1><svg viewBox="5 2 14 19" aria-hidden="true"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11h-2z"/></svg>Memo</h1><span id="versione">v1.1.0</span></div>
+<div id="titolo"><h1><svg viewBox="5 2 14 19" aria-hidden="true"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11h-2z"/></svg>Memo</h1><span id="versione">v1.1.1</span></div>
 
 <div id="area" role="button" aria-label="Tocca per registrare o fermare">
   <div id="cerchio">
@@ -116,7 +116,7 @@
 </div>
 
 <script>
-const VERSIONE = '1.1.0';
+const VERSIONE = '1.1.1';
 const DURATA_MAX = 5 * 60; // secondi: oltre questo tempo si ferma e salva da sola
 
 /* ---------- Archivio (IndexedDB) ---------- */
@@ -352,16 +352,16 @@ $('btnAnnullaNome').onclick = chiudiRinomina;
 $('nomeInput').addEventListener('keydown', e => { if (e.key === 'Enter') salvaNome(); });
 
 /* ---------- Calendario ---------- */
-// Apre l'app calendario con un nuovo evento già compilato (titolo = nome del memo).
+// Prova ad aprire l'app Google Calendar con un nuovo evento già compilato (titolo = nome del memo).
 // Se nessuna app risponde, apre Google Calendar nel browser.
 function apriCalendario(m) {
   const titolo = m.nome || ('Memo del ' + formatoData(m.data));
   const nota = 'Dal memo vocale del ' + formatoData(m.data);
   const web = 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=' +
     encodeURIComponent(titolo) + '&details=' + encodeURIComponent(nota);
-  const intent = 'intent:#Intent;action=android.intent.action.INSERT;type=vnd.android.cursor.item/event;' +
-    'S.title=' + encodeURIComponent(titolo) + ';S.description=' + encodeURIComponent(nota) +
-    ';S.browser_fallback_url=' + encodeURIComponent(web) + ';end';
+  // Prova ad aprire lo stesso indirizzo dentro l'app Google Calendar (pacchetto com.google.android.calendar)
+  const intent = 'intent://' + web.replace('https://', '') +
+    '#Intent;scheme=https;package=com.google.android.calendar;S.browser_fallback_url=' + encodeURIComponent(web) + ';end';
   location.href = /Android/i.test(navigator.userAgent) ? intent : web;
 }
 
