@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="it" style="background:#121619">
+<html lang="it" style="background:#0f1a1a">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#121619">
+<meta name="theme-color" content="#0f1a1a">
 <meta name="color-scheme" content="dark">
 <title>Memo</title>
 <link rel="manifest" href="manifest.json">
@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <style>
   :root {
-    --sfondo: #121619;
+    --sfondo: #0f1a1a;
     --pannello: #1c2328;
     --bordo: #2c363d;
     --testo: #a9b4bb;
@@ -35,20 +35,20 @@
   /* Schermata registrazione: tutto lo schermo è il pulsante */
   #area { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
     gap: 18px; text-align: center; padding: 24px; touch-action: manipulation; }
-  #cerchio { width: 140px; height: 140px; border-radius: 50%; background: var(--pannello);
-    border: 3px solid var(--bordo); display: flex; align-items: center; justify-content: center; }
-  #cerchio svg { width: 64px; height: 64px; fill: var(--tenue); }
+  #cerchio { width: 140px; height: 140px; border-radius: 50%; background: #1F4A4A;
+    border: 3px solid #2a5d5d; display: flex; align-items: center; justify-content: center; }
+  #cerchio svg { width: 64px; height: 64px; fill: #9FC7C2; }
   body.reg #cerchio { background: var(--rosso); border-color: var(--rosso-chiaro); animation: pulsa 1.4s infinite; }
   body.reg #cerchio svg { fill: #d9c4c4; }
   @keyframes pulsa { 50% { transform: scale(1.06); } }
-  #stato { font-size: 26px; font-weight: 600; }
+  #stato { font-size: 26px; font-weight: 600; color: #9fbdb9; }
   #tempo { font-size: 22px; color: var(--tenue); min-height: 28px; font-variant-numeric: tabular-nums; }
 
-  #barra { padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); border-top: 1px solid var(--bordo); }
+  #barra { padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); border-top: 1px solid #1F4A4A; }
   button { font: inherit; color: var(--testo); background: var(--pannello); border: 1px solid var(--bordo);
     border-radius: 10px; padding: 12px 16px; font-size: 18px; }
   button:active { background: var(--bordo); }
-  #btnElenco { width: 100%; }
+  #btnElenco { width: 100%; background: #16302f; border-color: #1F4A4A; color: #9FC7C2; }
 
   /* Schermata elenco */
   #elenco { display: none; flex: 1; flex-direction: column; overflow: hidden; }
@@ -88,7 +88,7 @@
 </style>
 </head>
 <body>
-<div id="titolo"><h1><svg viewBox="5 2 14 19" aria-hidden="true"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11h-2z"/></svg>Memo</h1><span id="versione">v1.1.1</span></div>
+<div id="titolo"><h1><svg viewBox="5 2 14 19" aria-hidden="true"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11h-2z"/></svg>Memo</h1><span id="versione">v1.2.0</span></div>
 
 <div id="area" role="button" aria-label="Tocca per registrare o fermare">
   <div id="cerchio">
@@ -116,7 +116,7 @@
 </div>
 
 <script>
-const VERSIONE = '1.1.1';
+const VERSIONE = '1.2.0';
 const DURATA_MAX = 5 * 60; // secondi: oltre questo tempo si ferma e salva da sola
 
 /* ---------- Archivio (IndexedDB) ---------- */
