@@ -24,7 +24,13 @@
   html, body { margin: 0; height: 100%; background: var(--sfondo); color: var(--testo);
     font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
   body { display: flex; flex-direction: column; user-select: none; -webkit-user-select: none; }
-  #versione { position: fixed; top: 6px; right: 10px; font-size: 12px; color: var(--tenue); z-index: 10; }
+  /* Intestazione: microfono, scritta e versione sulla stessa base (come Vault) */
+  #titolo { display: flex; align-items: baseline; justify-content: space-between; gap: 12px;
+    padding: calc(16px + env(safe-area-inset-top)) 16px 0; }
+  #titolo h1 { font-size: 28px; margin: 0; display: flex; align-items: baseline; gap: 6px; line-height: 1; }
+  #titolo h1 svg { width: 20px; height: 27px; flex-shrink: 0; position: relative; top: 1px; fill: #7fa8a3; }
+  #versione { font-size: 15px; color: #7fa8a3; white-space: nowrap; }
+  body.vista-elenco #titolo { display: none; }
 
   /* Schermata registrazione: tutto lo schermo è il pulsante */
   #area { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -49,23 +55,26 @@
   body.vista-elenco #area, body.vista-elenco #barra { display: none; }
   body.vista-elenco #elenco { display: flex; }
   body.vista-elenco, body.vista-elenco #elenco { background: #08090a; }
-  .memo .comandi button { background: #1c2328; }
-  #testaElenco { display: flex; align-items: center; gap: 12px; padding: 30px 16px 12px; border-bottom: 1px solid var(--bordo); }
-  #testaElenco h1 { font-size: 22px; margin: 0; flex: 1; }
-  #lista { flex: 1; overflow-y: auto; padding: 12px 16px calc(16px + env(safe-area-inset-bottom)); }
-  .memo { background: #27323a; border: 2px solid #4a5a66; border-radius: 12px; padding: 14px;
-    margin-bottom: 12px; }
-  .memo .data { font-size: 20px; font-weight: 600; }
-  .memo .durata { font-size: 16px; color: var(--tenue); margin-top: 4px; }
-  .memo .comandi { display: flex; gap: 10px; margin-top: 12px; }
-  .memo .comandi button { flex: 1; }
-  .memo.suona { border-color: var(--accento); }
-  .memo button.elimina { flex: 0 0 auto; color: var(--rosso-chiaro); }
-  #vuoto { text-align: center; color: var(--tenue); font-size: 20px; margin-top: 40px; }
+  #testaElenco { display: flex; align-items: center; gap: 12px; padding: 24px 14px 10px; border-bottom: 1px solid var(--bordo); }
+  #testaElenco h1 { font-size: 19px; margin: 0; flex: 1; }
+  #btnIndietro { font-size: 15px; padding: 8px 12px; }
+  #lista { flex: 1; overflow-y: auto; padding: 10px 14px calc(14px + env(safe-area-inset-bottom)); }
+  .memo { background: #27323a; border: none; border-radius: 10px; padding: 9px 12px;
+    margin-bottom: 8px; }
+  .memo .data { font-size: 16px; font-weight: 600; }
+  .memo .durata { font-size: 13px; color: var(--tenue); margin-top: 2px; }
+  .memo .comandi { display: flex; justify-content: space-between; margin-top: 4px; }
+  /* Solo scritte cliccabili, senza pulsante dietro */
+  .memo .comandi button { background: none; border: none; padding: 6px 0; font-size: 16px; font-weight: 700; }
+  .memo .comandi button:active { background: none; opacity: .6; }
+  .memo button.ascolta { color: #8fb3c2; }
+  .memo button.elimina { color: #c27a7a; }
+  .memo.suona { background: #31424d; }
+  #vuoto { text-align: center; color: var(--tenue); font-size: 17px; margin-top: 40px; }
 </style>
 </head>
 <body>
-<div id="versione">v1.0.2</div>
+<div id="titolo"><h1><svg viewBox="5 2 14 19" aria-hidden="true"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11h-2z"/></svg>Memo</h1><span id="versione">v1.0.3</span></div>
 
 <div id="area" role="button" aria-label="Tocca per registrare o fermare">
   <div id="cerchio">
@@ -85,7 +94,7 @@
 </div>
 
 <script>
-const VERSIONE = '1.0.2';
+const VERSIONE = '1.0.3';
 const DURATA_MAX = 5 * 60; // secondi: oltre questo tempo si ferma e salva da sola
 
 /* ---------- Archivio (IndexedDB) ---------- */

@@ -1,11 +1,12 @@
 # Memo – PWA per memo vocali (ipovedenti)
 
-**Versione:** 1.0.2 · **Repository previsto:** forrom58/memo · **URL:** https://forrom58.github.io/memo/
+**Versione:** 1.0.3 · **Repository previsto:** forrom58/memo · **URL:** https://forrom58.github.io/memo/
 
 ## Scopo
 Registrare brevi memo audio fuori casa **senza guardare lo schermo** e riascoltarli a casa.
 
 ## Come si usa
+- **Intestazione della home** (come Vault): a sinistra microfono + "Memo", a destra la versione, tutti sulla stessa linea di base; colore #7fa8a3.
 - **Apertura senza vista:** gesto **W** a schermo spento (Impostazioni > Gesti a schermo disattivato > Altro > Traccia una W → Memo).
 - **Registrare:** tocco ovunque sullo schermo (tranne la barra in basso).
   - Inizio: vibrazione breve + voce "Registro", poi parte il microfono.
@@ -26,7 +27,7 @@ Registrare brevi memo audio fuori casa **senza guardare lo schermo** e riascolta
 ## Dati tecnici
 - Audio: MediaRecorder, formato webm/opus.
 - Archivio: IndexedDB `memo-db`, tabella `memo` (id, data, secondi, audio). I memo restano **solo sul telefono**: disinstallando l'app o cancellando i dati del sito si perdono.
-- Colori interfaccia: sfondo #121619, pannelli #1c2328, testo #a9b4bb, registrazione in rosso scuro #7a2e2e. Elenco memo (dalla v1.0.2, più contrasto): sfondo #08090a, riquadri #27323a con bordo #4a5a66 da 2 px. Niente giallo, niente superfici chiare.
+- Colori interfaccia: sfondo #121619, pannelli #1c2328, testo #a9b4bb, registrazione in rosso scuro #7a2e2e. Elenco memo: sfondo #08090a, riquadri #27323a senza bordo, compatti; "Ascolta" (#8fb3c2) ed "Elimina" (#c27a7a) sono solo scritte cliccabili in grassetto, senza pulsante; memo in ascolto con riquadro #31424d. Niente giallo, niente superfici chiare.
 
 ## Aggiornare l'app
 1. Cambiare `VERSIONE` in index.html e il testo `v…` in alto a destra.
