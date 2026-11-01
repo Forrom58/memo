@@ -63,7 +63,7 @@
 </style>
 </head>
 <body>
-<div id="versione">v1.0.0</div>
+<div id="versione">v1.0.1</div>
 
 <div id="area" role="button" aria-label="Tocca per registrare o fermare">
   <div id="cerchio">
@@ -83,7 +83,7 @@
 </div>
 
 <script>
-const VERSIONE = '1.0.0';
+const VERSIONE = '1.0.1';
 const DURATA_MAX = 5 * 60; // secondi: oltre questo tempo si ferma e salva da sola
 
 /* ---------- Archivio (IndexedDB) ---------- */
@@ -207,6 +207,8 @@ async function salvaFine() {
   }
   $('stato').textContent = 'Tocca per registrare';
   occupato = false;
+  // Prova a chiudere l'app dopo il salvataggio (Android può ignorarlo)
+  try { window.close(); } catch (e) {}
 }
 
 $('area').addEventListener('click', () => {

@@ -1,17 +1,18 @@
 # Memo – PWA per memo vocali (ipovedenti)
 
-**Versione:** 1.0.0 · **Repository previsto:** forrom58/memo · **URL:** https://forrom58.github.io/memo/
+**Versione:** 1.0.1 · **Repository previsto:** forrom58/memo · **URL:** https://forrom58.github.io/memo/
 
 ## Scopo
 Registrare brevi memo audio fuori casa **senza guardare lo schermo** e riascoltarli a casa.
 
 ## Come si usa
-- **Apertura senza vista:** gesto a schermo spento del Realme (Impostazioni > Impostazioni di sistema > Gesti e movimenti > Gesti a schermo spento > Aggiungi gesto → apri app Memo) oppure "Ok Google, apri Memo".
+- **Apertura senza vista:** gesto **W** a schermo spento (Impostazioni > Gesti a schermo disattivato > Altro > Traccia una W → Memo).
 - **Registrare:** tocco ovunque sullo schermo (tranne la barra in basso).
   - Inizio: vibrazione breve + voce "Registro", poi parte il microfono.
   - Fine: nuovo tocco → doppia vibrazione + voce "Salvato, N secondi".
   - Errore: 3 vibrazioni brevi + voce.
   - Si ferma e salva da sola dopo 5 minuti.
+  - Dopo il salvataggio prova a chiudersi da sola (`window.close()`, dalla v1.0.1): Android può ignorarlo.
   - Durante la registrazione lo schermo resta acceso (Wake Lock).
 - **Ascoltare:** pulsante "Ascolta i memo" in basso → elenco (più recenti in alto) con data, ora, durata, Ascolta/Ferma, Elimina (con conferma).
 
