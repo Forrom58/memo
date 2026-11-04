@@ -35,11 +35,16 @@
   /* Schermata registrazione: tutto lo schermo è il pulsante */
   #area { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
     gap: 18px; text-align: center; padding: 24px; touch-action: manipulation; }
-  #cerchio { width: 140px; height: 140px; border-radius: 50%; background: #1F4A4A;
-    border: 3px solid #2a5d5d; display: flex; align-items: center; justify-content: center; }
-  #cerchio svg { width: 64px; height: 64px; fill: #9FC7C2; }
-  body.reg #cerchio { background: var(--rosso); border-color: var(--rosso-chiaro); animation: pulsa 1.4s infinite; }
-  body.reg #cerchio svg { fill: #d9c4c4; }
+  /* Come il modello: fondo nero, anello e microfono verde acqua pieni, alone ampio e sfumato dietro */
+  #cerchio { width: 150px; height: 150px; border-radius: 50%; background: #030505;
+    border: 5px solid #9FC7C2; display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 0 10px 3px rgba(190,225,220,.75), 0 0 34px 14px rgba(159,199,194,.45),
+      0 0 80px 38px rgba(159,199,194,.20), 0 0 140px 70px rgba(159,199,194,.08); }
+  #cerchio svg { width: 60px; height: 60px; fill: #9FC7C2; }
+  body.reg #cerchio { background: #030505; border-color: #c26a6a; animation: pulsa 1.4s infinite;
+    box-shadow: 0 0 10px 3px rgba(225,150,150,.7), 0 0 34px 14px rgba(194,106,106,.45),
+      0 0 80px 38px rgba(194,106,106,.20), 0 0 140px 70px rgba(194,106,106,.08); }
+  body.reg #cerchio svg { fill: #c26a6a; }
   @keyframes pulsa { 50% { transform: scale(1.06); } }
   /* Altezza fissa per due righe: il cerchio non si sposta quando cambia la scritta */
   #stato { font-size: 26px; font-weight: 600; color: #9fbdb9; line-height: 1.2; min-height: 2.4em;
@@ -59,11 +64,20 @@
   body.vista-elenco, body.vista-elenco #elenco { background: #08090a; }
   #testaElenco { display: flex; align-items: center; gap: 12px; padding: 24px 14px 10px; border-bottom: 1px solid var(--bordo); }
   #testaElenco h1 { font-size: 19px; margin: 0; flex: 1; }
-  #btnIndietro { font-size: 15px; padding: 8px 12px; }
+  #btnIndietro { font-size: 15px; padding: 8px 12px; background: #27323a; border-color: #27323a; }
   #lista { flex: 1; overflow-y: auto; padding: 10px 14px calc(14px + env(safe-area-inset-bottom)); }
   .memo { background: #27323a; border: none; border-radius: 10px; padding: 9px 12px;
     margin-bottom: 8px; }
   .memo .data { font-size: 16px; font-weight: 600; }
+  /* Frecce sposta su/giù nell'angolo destro, all'altezza del titolo */
+  .memo .riga1 { display: flex; align-items: center; gap: 8px; }
+  .memo .riga1 .data { flex: 1; min-width: 0; }
+  .memo .frecce { display: flex; gap: 2px; margin: -6px -6px -6px 0; }
+  .memo .frecce button { background: none; border: none; padding: 4px 8px; color: #8fa7b3; }
+  .memo .frecce button:active { opacity: .5; background: none; }
+  .memo .frecce svg { width: 18px; height: 18px; display: block; fill: none; stroke: currentColor;
+    stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+  .memo .frecce button:disabled { opacity: .2; }
   .memo .durata { font-size: 13px; color: var(--tenue); margin-top: 2px; }
   .memo .comandi { display: flex; justify-content: space-between; margin-top: 4px; }
   /* Solo scritte cliccabili, senza pulsante dietro */
@@ -90,7 +104,7 @@
 </style>
 </head>
 <body>
-<div id="titolo"><h1><svg viewBox="5 2 14 19" aria-hidden="true"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11h-2z"/></svg>Memo</h1><span id="versione">v1.2.1</span></div>
+<div id="titolo"><h1><svg viewBox="5 2 14 19" aria-hidden="true"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11h-2z"/></svg>Memo</h1><span id="versione">v1.3.1</span></div>
 
 <div id="area" role="button" aria-label="Tocca per registrare o fermare">
   <div id="cerchio">
@@ -118,7 +132,7 @@
 </div>
 
 <script>
-const VERSIONE = '1.2.1';
+const VERSIONE = '1.3.1';
 const DURATA_MAX = 5 * 60; // secondi: oltre questo tempo si ferma e salva da sola
 
 /* ---------- Archivio (IndexedDB) ---------- */
@@ -141,7 +155,9 @@ function salvaMemo(m) {
 function leggiMemo() {
   return new Promise((ok, ko) => {
     const r = db.transaction('memo').objectStore('memo').getAll();
-    r.onsuccess = () => ok(r.result.reverse()); r.onerror = () => ko(r.error);
+    // Ordine: campo 'ordine' (spostamenti), altrimenti la data; il più alto sta in cima
+    r.onsuccess = () => ok(r.result.sort((a, b) => (b.ordine ?? b.data) - (a.ordine ?? a.data)));
+    r.onerror = () => ko(r.error);
   });
 }
 function aggiornaMemo(m) {
@@ -237,7 +253,8 @@ async function salvaFine() {
   document.body.classList.remove('reg');
   try { wakeLock && wakeLock.release(); } catch (e) {} wakeLock = null;
   try {
-    await salvaMemo({ data: Date.now(), secondi, audio: blob });
+    const ora = Date.now();
+    await salvaMemo({ data: ora, ordine: ora, secondi, audio: blob });
     vibra([200, 100, 200]);
     $('stato').textContent = 'Salvato';
     $('tempo').textContent = durataScritta(secondi);
@@ -284,10 +301,13 @@ async function mostraElenco() {
   lista.innerHTML = '';
   const memo = await leggiMemo();
   if (!memo.length) { lista.innerHTML = '<div id="vuoto">Nessun memo salvato</div>'; return; }
-  memo.forEach(m => {
+  memo.forEach((m, i) => {
     const card = document.createElement('div');
     card.className = 'memo';
-    card.innerHTML = '<div class="data"></div><div class="durata"></div>' +
+    card.innerHTML = '<div class="riga1"><div class="data"></div><div class="frecce">' +
+      '<button class="su" aria-label="Sposta in alto"><svg viewBox="0 0 24 24"><path d="M6 15l6-6 6 6"/></svg></button>' +
+      '<button class="giu" aria-label="Sposta in basso"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>' +
+      '</div></div><div class="durata"></div>' +
       '<div class="comandi"><button class="ascolta">Ascolta</button><button class="calendario">Calendario</button>' +
       '<button class="elimina">Elimina</button></div>';
     if (m.nome) {
@@ -297,6 +317,12 @@ async function mostraElenco() {
       card.querySelector('.data').textContent = formatoData(m.data);
       card.querySelector('.durata').textContent = 'Durata ' + durataScritta(m.secondi);
     }
+    // Frecce: sposta di una posizione (il tocco sulle frecce non avvia la rinomina)
+    const su = card.querySelector('.su'), giu = card.querySelector('.giu');
+    su.disabled = i === 0; giu.disabled = i === memo.length - 1;
+    [su, giu].forEach(b => b.addEventListener('pointerdown', e => e.stopPropagation()));
+    su.onclick = () => sposta(memo, i, i - 1);
+    giu.onclick = () => sposta(memo, i, i + 1);
     // Tocco lungo sul riquadro: rinomina
     let tLungo = null, x0 = 0, y0 = 0;
     card.addEventListener('pointerdown', e => {
@@ -367,12 +393,33 @@ function apriCalendario(m) {
   location.href = /Android/i.test(navigator.userAgent) ? intent : web;
 }
 
+/* ---------- Sposta su/giù ---------- */
+async function sposta(memo, da, a) {
+  if (a < 0 || a >= memo.length) return;
+  // Assegna a tutti un ordine esplicito (in cima il valore più alto), poi scambia i due vicini
+  memo.forEach((m, k) => { m.ordine = memo.length - k; });
+  const x = memo[da].ordine; memo[da].ordine = memo[a].ordine; memo[a].ordine = x;
+  for (const m of memo) await aggiornaMemo(m);
+  vibra(30);
+  await mostraElenco();
+  // Riporta in vista il memo spostato
+  const c = $('lista').children[a]; if (c) c.scrollIntoView({ block: 'nearest' });
+}
+
 $('btnElenco').onclick = mostraElenco;
 $('btnIndietro').onclick = () => { fermaAscolto(); document.body.classList.remove('vista-elenco'); };
 
 /* ---------- Avvio ---------- */
 $('versione').textContent = 'v' + VERSIONE;
 apriDB();
+// All'apertura (e quando l'app torna in primo piano) dice "Tocca per registrare".
+// Android può bloccare la voce se non c'è stato prima un tocco: in quel caso resta muta.
+function annunciaAvvio() {
+  if (document.hidden || (rec && rec.state === 'recording') || document.body.classList.contains('vista-elenco')) return;
+  parla('Tocca per registrare');
+}
+setTimeout(annunciaAvvio, 400);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) setTimeout(annunciaAvvio, 300); });
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
 // Chiede all'archivio di non cancellare i memo per mancanza di spazio
 if (navigator.storage && navigator.storage.persist) navigator.storage.persist();
