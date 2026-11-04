@@ -1,6 +1,6 @@
 # Memo – PWA per memo vocali (ipovedenti)
 
-**Versione:** 1.3.1 · **Repository previsto:** forrom58/memo · **URL:** https://forrom58.github.io/memo/
+**Versione:** 1.4.0 · **Repository previsto:** forrom58/memo · **URL:** https://forrom58.github.io/memo/
 
 ## Scopo
 Registrare brevi memo audio fuori casa **senza guardare lo schermo** e riascoltarli a casa.
@@ -17,9 +17,10 @@ Registrare brevi memo audio fuori casa **senza guardare lo schermo** e riascolta
   - Dopo il salvataggio prova a chiudersi da sola (`window.close()`, dalla v1.0.1): Android può ignorarlo.
   - Durante la registrazione lo schermo resta acceso (Wake Lock).
   - La scritta di stato ha altezza fissa di due righe (dalla v1.2.1): prima "Registro… tocca per fermare" andava a capo e il cerchio saliva di circa 15 px.
+- **Testo del parlato (dalla v1.4.0, in prova):** durante la registrazione gira anche il riconoscimento vocale di Chrome (`webkitSpeechRecognition`, it-IT, serve internet); Android lo chiude dopo le pause e l'app lo riapre finché si registra. Il testo va nel campo `testo` del memo. Titolo automatico = prime 8 parole del testo (se non c'è un nome dato a mano). Nel calendario: titolo = nome o titolo automatico, nota = testo completo + data del memo. Se il riconoscimento non funziona l'audio si salva comunque. Possibile conflitto sul microfono tra registrazione e riconoscimento: da verificare sul Realme.
 - **Ascoltare:** pulsante "Ascolta i memo" in basso → elenco (più recenti in alto) con data, ora, durata, Ascolta/Ferma, Elimina (con conferma).
 - **Rinominare (dalla v1.1.0):** tocco lungo (0,6 s) su un riquadro → vibrazione → finestra scura "Nome del memo" (Salva / Annulla). Il nome compare al posto della data; data e durata vanno nella riga piccola sotto. Nome vuoto = torna a mostrare la data. Campo `nome` nel record IndexedDB.
-- **Spostare (dalla v1.3.0):** due frecce ˄ ˅ nell'angolo destro di ogni memo, all'altezza del titolo; un tocco sposta di una posizione (la freccia inutile del primo/ultimo è spenta). Campo `ordine` nel record (più alto = più in alto); i memo nuovi hanno `ordine` = ora e vanno in cima.
+- **Spostare (dalla v1.3.0):** due frecce ˄ ˅ nell'angolo destro di ogni memo, all'altezza del titolo; frecce da 26 px, tratto spesso, colore chiaro #d0e0e6 (dalla v1.3.2); un tocco sposta di una posizione (la freccia inutile del primo/ultimo è spenta). Campo `ordine` nel record (più alto = più in alto); i memo nuovi hanno `ordine` = ora e vanno in cima.
 - **Calendario (dalla v1.1.0):** scritta "Calendario" (#9fb39a) tra Ascolta ed Elimina. Crea un evento già compilato (titolo = nome del memo, oppure "Memo del …"; nota = data del memo). v1.1.0: intent `android.intent.action.INSERT` → non funziona da Chrome (apriva Google Calendar nel browser). v1.1.1: intent verso il pacchetto `com.google.android.calendar` con l'indirizzo `calendar.google.com/calendar/render?action=TEMPLATE…`; se l'app non lo accetta apre la versione web. Esito sul Realme: **funziona**, si apre l'app con l'evento compilato. Data e ora dell'evento si scelgono nel calendario.
 
 ## File (ordine alfabetico)
