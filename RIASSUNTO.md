@@ -1,6 +1,6 @@
 # Memo – PWA per memo vocali (ipovedenti)
 
-**Versione:** 1.4.3 · **Repository previsto:** forrom58/memo · **URL:** https://forrom58.github.io/memo/
+**Versione:** 1.4.4 · **Repository previsto:** forrom58/memo · **URL:** https://forrom58.github.io/memo/
 
 ## Scopo
 Registrare brevi memo audio fuori casa **senza guardare lo schermo** e riascoltarli a casa.
@@ -25,7 +25,7 @@ Registrare brevi memo audio fuori casa **senza guardare lo schermo** e riascolta
 
 ## File (ordine alfabetico)
 - icon-192-v2.png, icon-512-v2.png – icona secondo lo standard di ICONE-DELLE-MIE-APP.md: fascia da y=369, "MEMO" in Barlow Black 132 px (base y=491); sfondo #1F4A4A, fascia #9FC7C2, scritta #143434, microfono #D2E6E3 (linee 18 px, appoggiato sulla fascia; dalla v1.4.2 rimpicciolito all'88% con la base ferma su y=367, cima a y≈79)
-- icon-maskable-512-v2.png – (dalla v1.4.2) icona al 78% centrata con margini dei suoi colori (sopra #1F4A4A, sotto #9FC7C2), come TELE; nel manifest con `"purpose": "maskable"` per avere angoli arrotondati anche nello splash. Nella v1.4.3 i file icona sono stati rinominati con "-v2" perché Android teneva le icone vecchie: cambiare nome obbliga Chrome a scaricarle di nuovo. Per vederle: disinstallare e reinstallare l'app
+- icon-maskable-512-v3.png – (dalla v1.4.4) **identica a icon-512-v2.png**, nel manifest con `"purpose": "maskable"` per lo splash con angoli arrotondati. La v1.4.2–1.4.3 usava una maskable rimpicciolita al 78%: il Realme la mostrava così anche nella home, con scritta più piccola e più bassa delle altre icone → scartata.
 - index.html – tutta l'app (HTML, CSS, JS)
 - manifest.json – nome breve "Memo", sfondo scuro #0f1a1a (evita il lampo chiaro)
 - RIASSUNTO.md – questo file
