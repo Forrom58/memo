@@ -1,6 +1,6 @@
 // Cambiare il numero a ogni aggiornamento dell'app
-const CACHE = 'memo-v1.4.2';
-const FILE = ['./', 'index.html', 'manifest.json', 'icon-192.png', 'icon-512.png', 'icon-maskable-512.png'];
+const CACHE = 'memo-v1.4.3';
+const FILE = ['./', 'index.html', 'manifest.json', 'icon-192-v2.png', 'icon-512-v2.png', 'icon-maskable-512-v2.png'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILE)));
